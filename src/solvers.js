@@ -14,37 +14,125 @@
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n rooks placed such that none of them can attack each other
 
 window.findNRooksSolution = function(n) {
-  var solution = undefined; //fixme
+  var board = new Board({n:n});
+  for(var i = 0; i < n; i++){
+    for(var j = 0; j < n; j++){
+      if(board.rows()[i][j] === 0){
+        board.togglePiece(i, j);
+        if(board.hasAnyRooksConflicts()){
+          board.togglePiece(i, j);
+        }
+      }
+    }
+  }
 
-  console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
-  return solution;
-};
+  return board.rows();
+},
 
 
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
-  var solutionCount = undefined; //fixme
+  var playingField = new Board({n:n});
+  var numSolutions = 0;
+  var board = playingField.rows();
 
-  console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
-  return solutionCount;
-};
+  var recursor = function(x){
+    if(x >= n){ //base case
+      return numSolutions++;
+    }
+    
+    // place a single piece, go to next row
+    for(var y = 0; y < board[x].length; y++){
+
+      playingField.togglePiece(x, y); // add piece
+
+      if(!playingField.hasAnyRooksConflicts() ){ // if the placement was good
+        recursor(x + 1);
+      }
+
+      playingField.togglePiece(x, y); // remove piece
+    }
+  };
+  
+  recursor(0);
+  
+  return numSolutions;
+},
 
 
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
-  var solution = undefined; //fixme
+  
+  var deepSlice = function(arr){
+    var copy = [];
+    for(var i = 0; i < arr.length; i++){
+      var row = [];
+      for(var j = 0; j < arr[i].length; j++){
+        row.push(arr[i][j]);
+      }
+      copy.push(row);
+    }
+    return copy;
+  };
 
-  console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
-  return solution;
-};
+  var playingField = new Board({n:n});
+  var solution;
+  var board = playingField.rows();
+
+  var recursor = function(x){
+    if(x >= n){ //base case
+      solution = deepSlice(board);
+      console.log('in recursor ' + JSON.stringify(solution));
+      return;
+    }
+    
+    // place a single piece, go to next row
+    for(var y = 0; y < board[x].length; y++){
+
+      playingField.togglePiece(x, y); // add piece
+
+      if(!playingField.hasAnyQueenConflictsOn(x,y) ){ // if the placement was good
+        recursor(x + 1);
+      }
+
+      playingField.togglePiece(x, y); // remove piece
+    }
+  };
+  
+  recursor(0);
+  console.log('final solution ' + JSON.stringify(solution));
+  
+  return solution || board;
+},
 
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
 window.countNQueensSolutions = function(n) {
-  var solutionCount = undefined; //fixme
+  var playingField = new Board({n:n});
+  var numSolutions = 0;
+  var board = playingField.rows();
 
-  console.log('Number of solutions for ' + n + ' queens:', solutionCount);
-  return solutionCount;
+  var recursor = function(x){
+    if(x >= n){ //base case
+      return numSolutions++;
+    }
+    
+    // place a single piece, go to next row
+    for(var y = 0; y < board[x].length; y++){
+
+      playingField.togglePiece(x, y); // add piece
+
+      if(!playingField.hasAnyQueenConflictsOn(x,y) ){ // if the placement was good
+        recursor(x + 1);
+      }
+
+      playingField.togglePiece(x, y); // remove piece
+    }
+  };
+  
+  recursor(0);
+  
+  return numSolutions;
 };
